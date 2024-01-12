@@ -1,0 +1,25 @@
+[package]
+name = "vmem"
+authors = ["Lysander Mealy (lylythechosenone)"]
+version = "1.0.0-rc1"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+readme = "README.md"
+repository = "https://github.com/lylythechosenone/vmem"
+keywords = ["no_std", "allocator", "vmem", "resource"]
+categories = ["no-std", "no-std::no-alloc", "memory-management"]
+description = """Vmem is a resource management system theorized by Jeff Bonwick and Jonathan
+Adams in *[Magazines and Vmem: Extending the Slab Allocator to Many CPUs and
+Arbitrary Resources][1]*. It provides O(1) allocation and deallocation of any
+opaque numerical 'resource,' such as a block of memory or a process ID."""
+
+[dependencies]
+portable-atomic = "1"
+rustc-hash = { version = "1", default-features = false }
+spin = { version = "0.9", optional = true }
+
+[features]
+default = ["nightly"]
+nightly = []
+std = []
+spin = ["dep:spin"]
