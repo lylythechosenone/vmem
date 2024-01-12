@@ -30,7 +30,7 @@ impl Layout {
         if !align.is_power_of_two() {
             return None;
         }
-        if !size > 0 {
+        if size == 0 {
             return None;
         }
         Some(Self {
