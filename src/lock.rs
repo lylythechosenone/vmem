@@ -50,7 +50,7 @@ unsafe impl Lock for Mutex<()> {
     }
 }
 
-#[cfg(any(test, feature = "std"))]
+#[cfg(any(test, doc, feature = "std"))]
 unsafe impl Lock for std::sync::Mutex<()> {
     type Guard<'a> = std::sync::MutexGuard<'a, ()>;
 
