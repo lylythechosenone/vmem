@@ -499,6 +499,18 @@ impl<'label, 'src, A: alloc::Allocator, L: lock::Lock> Debug for Arena<'label, '
         Ok(())
     }
 }
+impl<'label, 'src, A: alloc::Allocator, L: lock::Lock> Drop for Arena<'label, 'src, A, L> {
+    fn drop(&mut self) {
+        let guard = self.lock.lock();
+        let inner = unsafe { &mut *self.inner.get() };
+        for bt in unsafe { inner.segment_list.iter() } {
+            unsafe {
+                self.allocator.deallocate(bt);
+            }
+        }
+        drop(guard);
+    }
+}
 
 struct ArenaInner {
     segment_list: SegmentList,
