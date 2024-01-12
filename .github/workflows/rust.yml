@@ -16,9 +16,23 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+    - uses: actions-rs/toolchain@v1
+      with:
+        toolchain: nightly
+        default: true
+        components: rustfmt, clippy
     - name: Build
-      run: cargo build --verbose
+      uses: actions-rs/cargo@v1
+      with:
+        command: build
+        args: --verbose
     - name: Run clippy
-      run: cargo clippy --verbose
+      uses: actions-rs/cargo@v1
+      with:
+        command: clippy
+        args: --verbose --all-targets --all-features -- -D warnings
     - name: Run tests
-      run: cargo test --verbose
+      uses: actions-rs/cargo@v1
+      with:
+        command: test
+        args: --verbose --all-targets --all-features
