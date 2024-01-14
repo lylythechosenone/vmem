@@ -476,6 +476,11 @@ impl<'label, 'src, A: alloc::Allocator, L: lock::Lock> Arena<'label, 'src, A, L>
         drop(guard);
         borrowed
     }
+
+    /// Get the label for this arena.
+    pub fn label(&self) -> &'label str {
+        self.label
+    }
 }
 impl<'label, 'src, A: alloc::Allocator, L: lock::Lock> Debug for Arena<'label, 'src, A, L> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
