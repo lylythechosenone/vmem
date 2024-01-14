@@ -508,6 +508,14 @@ impl<'label, 'src, A: alloc::Allocator, L: lock::Lock> Drop for Arena<'label, 's
         let guard = self.lock.lock();
         let inner = unsafe { &mut *self.inner.get() };
         for bt in unsafe { inner.segment_list.iter() } {
+            if unsafe { bt.as_ref() }.ty == Type::Borrowed {
+                unsafe {
+                    self.source
+                        .unwrap()
+                        .release(bt.as_ref().base, bt.as_ref().len)
+                        .unwrap();
+                }
+            }
             unsafe {
                 self.allocator.deallocate(bt);
             }
