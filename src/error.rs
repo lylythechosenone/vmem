@@ -21,7 +21,7 @@ pub enum Error {
     /// Space could not be imported because there was no source to import from.
     NoSource,
     /// The span would wrap around the address space.
-    InvalidSpan,
+    WrappingSpan,
     /// The span was not aligned to the quantum.
     UnalignedSpan,
     /// Attempted to allocate a zero-sized block.
@@ -37,8 +37,8 @@ impl Display for Error {
             Self::Empty => write!(f, "empty"),
             Self::NoSuchAllocation => write!(f, "no such allocation"),
             Self::NoSource => write!(f, "no source"),
-            Self::InvalidSpan => write!(f, "invalid span"),
-            Self::UnalignedSpan => write!(f, "unaligned span"),
+            Self::WrappingSpan => write!(f, "invalid span"),
+            Self::UnalignedSpan => write!(f, "this span would wrap around the address space"),
             Self::AllocZeroSize => write!(f, "attempted to allocate a zero-sized block"),
             Self::Other(s) => write!(f, "{}", s),
         }

@@ -156,8 +156,8 @@ impl<'label, 'src, A: alloc::Allocator, L: lock::Lock> Arena<'label, 'src, A, L>
     /// - `allocator` - the allocator to use for allocating boundary tags.
     ///
     /// # Returns
-    /// If the quantum is not a power of two, an error will be returned.
-    /// Otherwise, the function will return an arena
+    /// If the quantum is not a power of two, [`Error::InvalidQuantum`] will be
+    /// returned. Otherwise, the function will return an arena
     pub fn create(
         label: &'label str,
         quantum: usize,
@@ -200,16 +200,18 @@ impl<'label, 'src, A: alloc::Allocator, L: lock::Lock> Arena<'label, 'src, A, L>
     ///
     /// # Returns
     /// If the span could not be added, one of these errors will be returned:
-    /// - [`Error::AllocatorError`] - the allocator could not allocate a boundary
-    ///   tag to support this span.
-    /// - [`Error::InvalidSpan`] - the span could not be added because it would
+    /// - [`Error::AllocatorError`] - the allocator could not allocate a
+    ///   boundary tag to support this span.
+    /// - [`Error::AllocZeroSize`] - the span has no size.
+    /// - [`Error::UnalignedSpan`] - the span is not aligned to `quantum`
+    /// - [`Error::WrappingSpan`] - the span could not be added because it would
     ///   overflow.
     pub fn add_span(&self, base: usize, len: usize) -> error::Result<()> {
         if len == 0 {
             return Err(Error::AllocZeroSize);
         }
         if usize::MAX - base < len {
-            return Err(Error::InvalidSpan);
+            return Err(Error::WrappingSpan);
         }
         if base % self.quantum != 0 || len % self.quantum != 0 {
             return Err(Error::UnalignedSpan);
@@ -265,8 +267,9 @@ impl<'label, 'src, A: alloc::Allocator, L: lock::Lock> Arena<'label, 'src, A, L>
     /// returned:
     /// - [`Error::Empty`] - the arena is empty, and no source was specified to
     ///   borrow from.
-    /// - [`Error::AllocatorError`] - the allocator could not allocate a boundary
-    ///   tag to support this block.
+    /// - [`Error::AllocatorError`] - the allocator could not allocate a
+    ///   boundary tag to support this block.
+    /// - [`Error::AllocZeroSize`] - the requested allocation has no size.
     ///
     /// If a source is specified, this function will forward any errors given by
     /// it.
@@ -306,6 +309,7 @@ impl<'label, 'src, A: alloc::Allocator, L: lock::Lock> Arena<'label, 'src, A, L>
     ///  borrow from.
     /// - [`Error::AllocatorError`] - the allocator could not allocate a boundary
     /// tag to support this block.
+    /// - [`Error::AllocZeroSize`] - the requested allocation has no size.
     ///
     /// If a source is specified, this function will forward any errors given by
     /// it.
