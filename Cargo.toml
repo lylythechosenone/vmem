@@ -13,6 +13,10 @@ Adams in *[Magazines and Vmem: Extending the Slab Allocator to Many CPUs and
 Arbitrary Resources][1]*. It provides O(1) allocation and deallocation of any
 opaque numerical 'resource,' such as a block of memory or a process ID."""
 
+[[example]]
+name = "repl"
+required-features = ["std"]
+
 [dependencies]
 portable-atomic = "1"
 rustc-hash = { version = "1", default-features = false }
@@ -23,3 +27,9 @@ default = ["nightly"]
 nightly = []
 std = []
 spin = ["dep:spin"]
+
+[dev-dependencies]
+anyhow = "1"
+clap = { version = "4", features = ["derive"] }
+clap-num = "1"
+linefeed = "0.6"
