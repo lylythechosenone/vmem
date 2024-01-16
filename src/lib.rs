@@ -56,7 +56,7 @@ pub enum AllocPolicy {
 
 /// Something that can be used as a source for an arena. See
 /// [`Arena`](Arena#importing-from-a-source) for more details.
-pub trait Source {
+pub trait Source: Sync {
     /// Import a block that satisfies `Layout` from this source, returning its
     /// base.
     ///
@@ -74,7 +74,9 @@ pub trait Source {
     /// not [`release`](Source::release)d yet.
     unsafe fn release(&self, base: usize, size: usize) -> error::Result<()>;
 }
-impl<'label, 'src, A: alloc::Allocator, L: lock::Lock> Source for Arena<'label, 'src, A, L> {
+impl<'label, 'src, A: alloc::Allocator + Sync, L: lock::Lock + Sync> Source
+    for Arena<'label, 'src, A, L>
+{
     fn import(&self, layout: Layout) -> error::Result<usize> {
         match (layout.min(), layout.max(), layout.phase(), layout.nocross()) {
             (None, None, None, None) if layout.align() <= self.quantum => {
@@ -527,6 +529,14 @@ impl<'label, 'src, A: alloc::Allocator, L: lock::Lock> Drop for Arena<'label, 's
         }
         drop(guard);
     }
+}
+unsafe impl<'label, 'src, A: alloc::Allocator + Sync, L: lock::Lock + Sync> Sync
+    for Arena<'label, 'src, A, L>
+{
+}
+unsafe impl<'label, 'src, A: alloc::Allocator + Send, L: lock::Lock + Send> Send
+    for Arena<'label, 'src, A, L>
+{
 }
 
 struct ArenaInner {
